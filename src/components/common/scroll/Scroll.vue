@@ -55,6 +55,7 @@ export default {
     this.scroll.on('pullingUp',(position) => {
       this.$emit('pullingUp')
     })
+
   },
   methods: {
     scrollTo(x,y,time=500){
@@ -69,4 +70,4 @@ export default {
 
 <style>
 
-</style>
+</style> 
