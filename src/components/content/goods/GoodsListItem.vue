@@ -1,7 +1,7 @@
 <template>
-  <div class="goods-item">
+  <div class="goods-item" @click="itemClick">
       <!-- goodsItem.show.img 为商品封面图-->
-    <img :src="goodsItem.show.img" alt="">
+    <img v-lazy="showImage" alt="" @load="imageLoad">
     <div class="goods-info">
       <p>{{goodsItem.title}}</p>
       <span class="price">{{goodsItem.price}}</span> 
@@ -24,11 +24,49 @@ export default {
         return {}
       }
     }
+  },
+  computed: {
+    showImage(){
+      return this.goodsItem.image || this.goodsItem.show.img
+    }
+  },
+  methods: {
+    imageLoad() {
+
+    // 因为首页和detail中都用了GoodsItem这个组件
+    // 所以发送事件监听时，要区分一下是从哪里发出的
+
+      // 1. 图片加载完成时，发送一个 itemImageLoad 事件到事件总线 $bus
+        // this.$bus.$emit('itemImageLoad')    
+        // $bus在main.js中定义在Vue的原型上
+
+
+      // 2. 判断路由的方式，发送不同的事件，在不同的页面监听
+        if(this.$route.path.indexOf('/home') !== -1){
+          this.$bus.$emit('homeItemImageLoad')
+        }else if(this.$route.path.indexOf('/detail') !== -1){
+          this.$bus.$emit('detailItemImageLoad')
+        }
+
+    },
+    itemClick() {
+      console.log(this.goodsItem.iid);
+      console.log(this.goodsItem.item_id);
+      console.log(this.$route);
+      if(this.$route.path.indexOf('/home') !== -1){
+        this.$router.push('/detail/' + this.goodsItem.iid)
+        console.log('跳转到详情页');
+      }else if(this.$route.path.indexOf('/detail') !== -1){
+        this.$router.push('/detail/' + this.goodsItem.item_id)
+        console.log('根据接口给的item_id没有给商品数据，跳不过去');
+      }
+
+    }
   }
 }
 </script>
 
-<style>
+<style scoped>
   .goods-item{
     padding-bottom: 40px;
     position: relative;

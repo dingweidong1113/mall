@@ -5,6 +5,7 @@ const Home = () => import('views/home/Home')
 const Category = () => import('views/category/Category')
 const Cart = () => import('views/cart/Cart')
 const Profile = () => import('views/profile/Profile')
+const Detail = () => import('views/detail/Detail')
 
 
 
@@ -16,23 +17,32 @@ const router = new VueRouter({
   routes: [
     {
       path: '',
-      redirect: '/home'
+      redirect: '/home',
+      meta: {footShow: true}
     },
     {
       path: '/home',
-      component: Home
+      component: Home,
+      meta: {footShow: true}
     },
     {
       path: '/category',
-      component: Category
+      component: Category,
+      meta: {footShow: true}
     },
     {
       path: '/cart',
-      component: Cart
+      component: Cart,
+      meta: {footShow: true}
     },
     {
       path: '/profile',
-      component: Profile
+      component: Profile,
+      meta: {footShow: true}
+    },
+    {
+      path: '/detail/:iid',   // 动态路由
+      component: Detail
     }
   ],
   mode: 'history'

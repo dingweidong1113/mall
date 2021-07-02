@@ -19,7 +19,7 @@ export default {
     },
     pullUpLoad: {
       type: Boolean,
-      default: false
+      default: true
     }
   },
   data(){
@@ -35,7 +35,9 @@ export default {
       click: true,
       pullUpLoad: this.pullUpLoad,  
       observeDOM: true, 
-      observeImage: true,
+      observeImage: {
+        debounceTime: 100
+      },
       mouseWheel: {   // 扩展 BetterScroll 鼠标滚轮的能力
         speed: 20,
         invert: false,
@@ -55,14 +57,20 @@ export default {
     this.scroll.on('pullingUp',(position) => {
       this.$emit('pullingUp')
     })
-
   },
   methods: {
+    refresh() {
+      // console.log('防抖完成');
+      this.scroll.refresh()
+    },
     scrollTo(x,y,time=500){
       this.scroll.scrollTo(x,y,time)
     },
     finishPullUp(){
       this.scroll.finishPullUp()
+    },
+    getScrollY(){
+      return this.scroll ? this.scroll.y : 0
     }
   }
 }

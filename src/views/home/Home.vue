@@ -8,7 +8,7 @@
                   @tabClick='tabChange'
                   ref="tabControl1"
                   v-show="isTabFixed"></tab-control>
-    <scroll class="content" ref="scroll" 
+    <scroll class="home-content" ref="scroll" 
             :probe-type= "3" 
             @scroll="contentScroll"
             @pullingUp="loadMore"
@@ -20,7 +20,9 @@
                   @tabClick='tabChange'
                   ref="tabControl2"
                   class="tab-control"></tab-control>
-      <goods-list :goods="showGoods"></goods-list>
+      <keep-alive exclude="Detail">
+        <goods-list :goods="showGoods"></goods-list>
+      </keep-alive>
     </scroll>
 
     <!-- 组件不能直接监听点击事件，加一个 .native修饰符: 监听组件根元素的原生事件 -->
@@ -69,10 +71,11 @@ export default {
         'new':{page:0,list:[]},
         'sell':{page:0,list:[]},
       },
-      currentType:'pop',
-      isShowBackTop: false,
-      tabOffsetTop: 0,
-      isTabFixed: false
+      currentType:'pop',    // 当前数据属于哪个类型（流行、新款、精选）
+      isShowBackTop: false,  // 是否展示 回到顶部 箭头按钮
+      tabOffsetTop: 0,      // tabControl 距离顶部距离
+      isTabFixed: false,    // tabControl 是否固定
+      saveY: 0              // 离开首页时保存当前位置
     }
   },
   computed: {
@@ -80,23 +83,60 @@ export default {
       return this.goods[this.currentType].list
     }
   },
+  destroyed() {
+    console.log("home-destroyed");   // 首页被销毁
+  },
+  activated(){  // 被keep-alive包裹组件在活跃状态时
+    // console.log("activated");
+    this.$refs.scroll.refresh();
+    this.$refs.scroll.scrollTo(0,this.saveY,0)     // 滚动到保存的位置 Y  
+    this.$refs.scroll.scroll.startY = this.saveY   // 或者用：startY  ，better-scroll自带属性：纵轴方向初始化位置
+  },
+  deactivated(){ // 被keep-alive包裹组件在失去活跃状态时
+    // console.log("deactivated");
+    this.saveY = this.$refs.scroll.getScrollY();    //保存离开时的位置 Y  
+  },
   created(){
     // 1. 请求多个数据
     this.getHomedata(),
-
-    // 请求商品数据
+  
+    // 2. 请求商品数据
     this.getGoods('pop'),
     this.getGoods('new'),
     this.getGoods('sell')
     
+
+
   },
   mounted() {
+    // 把refresh包一层防抖函数
+    const newRefresh = this.debounce(this.$refs.scroll.refresh,100);
+
+    // 3. 监听 GoodsListItem 中图片加载完成  ( 新版better-scroll 已经用 observeImage 解决了这个问题)
+    this.$bus.$on('homeItemImageLoad', () => {   // 监听事件总线中的 homeItemImageLoad 事件
+      // console.log("---");   // 会打印30次（因为一次获取30件商品，有30章图片）
+      newRefresh()   
+    })
+
+
     // 获取 tabControl 的 offsetTop
     // 所有组件都有一个属性 $el
     // console.log(this.$refs.tabControl2.$el.offsetTop);
     // 此时打印的offsetTop不对，因为mounted挂载完时，图片不一定加载完，拿到的值会很小
+    // 所以用 swiperImageLoad 方法进行获取
   },
   methods: {
+  // 防抖函数
+    debounce(func,delay){
+      let timer = null;
+      return function(...args) {
+        if(timer) clearTimeout(timer)
+        timer = setTimeout(() => {
+          func.apply(this,args)
+        },delay)
+      }
+    },
+
   // 网络请求相关
     getHomedata(){
       // 1. 请求多个数据，再包一层，created中尽量简单
@@ -130,7 +170,8 @@ export default {
         case 2: this.currentType = 'sell' 
           break
       }
-      this.$refs.tabControl1.currentIndex = index
+      // 两个tabControl互相绑定
+      this.$refs.tabControl1.currentIndex = index  
       this.$refs.tabControl2.currentIndex = index
     },
     backClick(){
@@ -153,7 +194,7 @@ export default {
       // 所有组件都有一个属性 $el
       console.log(this.$refs.tabControl2.$el.offsetTop);
       this.tabOffsetTop = this.$refs.tabControl2.$el.offsetTop
-    }
+    },
   }
 }
 </script>
@@ -164,6 +205,7 @@ export default {
   #home{  
     /* padding-top: 44px;    */
     height: 100vh;
+    position: relative;
   }
   .home-nav{
     background-color: var(--color-tint);
@@ -182,7 +224,7 @@ export default {
     position: relative;
   }
 
-  .content{
+  .home-content{
     /* height: calc(100vh - 93px); */
     overflow: hidden; 
     position: absolute;
