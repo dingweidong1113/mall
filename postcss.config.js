@@ -12,14 +12,14 @@ module.exports = {
     //   mediaQuery: false,  // 是否允许在媒体查询中转换'px'
     //   // exclude:[/TabBar/]  // 指定不需要转换的文件（可以是文件名，也可以是正则）
     // },
-    "postcss-pxtorem": {
-      rootValue: 16, //结果为：设计稿元素尺寸/16，比如元素宽320px,最终页面会换算成 20rem
-      propList: ["*"], //是一个存储哪些将被转换的属性列表，这里设置为['*']全部，假设需要仅对边框进行设置，可以写['*', '!border*']
-      unitPrecision: 5, //保留rem小数点多少位
-      //selectorBlackList: ['.radius'],  //则是一个对css选择器进行过滤的数组，比如你设置为['fs']，那例如fs-xl类名，里面有关px的样式将不被转换，这里也支持正则写法。
-      replace: true, //这个真不知到干嘛用的。有知道的告诉我一下
-      mediaQuery: false, //媒体查询( @media screen 之类的)中不生效
-      minPixelValue: 1, //px小于1px的不会被转换
-    },
+    // "postcss-pxtorem": {
+    //   rootValue: 16, //结果为：设计稿元素尺寸/16，比如元素宽320px,最终页面会换算成 20rem
+    //   propList: ["*"], //是一个存储哪些将被转换的属性列表，这里设置为['*']全部，假设需要仅对边框进行设置，可以写['*', '!border*']
+    //   unitPrecision: 5, //保留rem小数点多少位
+    //   //selectorBlackList: ['.radius'],  //则是一个对css选择器进行过滤的数组，比如你设置为['fs']，那例如fs-xl类名，里面有关px的样式将不被转换，这里也支持正则写法。
+    //   replace: true, //这个真不知到干嘛用的。有知道的告诉我一下
+    //   mediaQuery: false, //媒体查询( @media screen 之类的)中不生效
+    //   minPixelValue: 1, //px小于1px的不会被转换
+    // },
   }
 }
