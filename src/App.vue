@@ -21,6 +21,6 @@
 <style>
   @import "assets/css/base.css";
   .mainTabBar{
-    z-index: 10;
+    z-index: 11;
   }
 </style>
